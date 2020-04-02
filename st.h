@@ -112,6 +112,7 @@ void *xrealloc(void *, size_t);
 char *xstrdup(char *);
 
 /* config.h globals */
+extern char *externalpipe_sigusr1[];
 extern char *utmp;
 extern char *stty_args;
 extern char *vtiden;

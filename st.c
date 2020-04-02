@@ -155,6 +155,7 @@ typedef struct {
 static void execsh(char *, char **);
 static void stty(char **);
 static void sigchld(int);
+static void sigusr1(int);
 static void ttywriteraw(const char *, size_t);
 
 static void csidump(void);
@@ -720,6 +721,13 @@ execsh(char *cmd, char **args)
 }
 
 void
+sigusr1(int unused)
+{
+  static Arg a = {.v = externalpipe_sigusr1};
+  externalpipe(&a);
+}
+
+void
 sigchld(int a)
 {
 	int stat;
@@ -765,6 +773,12 @@ stty(char **args)
 int
 ttynew(char *line, char *cmd, char *out, char **args)
 {
+	static struct sigaction sa;
+	sa.sa_handler = sigusr1;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGUSR1, &sa, NULL);
+
 	int m, s;
 
 	if (out) {
