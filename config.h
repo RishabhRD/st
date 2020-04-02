@@ -64,7 +64,7 @@ static int bellvolume = 0;
 
 /* default TERM value */
 char *termname = "st-256color";
-
+char *externalpipe_sigusr1[] = {"/bin/sh", "-c", "externalpipe_buffer.sh st_strings_read"};
 /*
  * spaces per tab
  *
