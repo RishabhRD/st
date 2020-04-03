@@ -76,11 +76,21 @@ typedef union {
 	const void *v;
 } Arg;
 
+typedef struct {
+	uint b;
+	uint mask;
+	void (*func)(const Arg *);
+	const Arg arg;
+} MouseKey;
+
 void die(const char *, ...);
 void redraw(void);
 void draw(void);
 
 void externalpipe(const Arg *);
+void iso14755(const Arg *);
+void kscrolldown(const Arg *);
+void kscrollup(const Arg *);
 void printscreen(const Arg *);
 void printsel(const Arg *);
 void sendbreak(const Arg *);
@@ -110,17 +120,17 @@ size_t utf8encode(Rune, char *);
 void *xmalloc(size_t);
 void *xrealloc(void *, size_t);
 char *xstrdup(char *);
-int trt_kbdselect(KeySym, char *, int);
 
 /* config.h globals */
-extern char *externalpipe_sigusr1[];
 extern char *utmp;
 extern char *stty_args;
 extern char *vtiden;
-extern char *worddelimiters;
+extern wchar_t *worddelimiters;
 extern int allowaltscreen;
 extern char *termname;
 extern unsigned int tabspaces;
 extern unsigned int defaultfg;
 extern unsigned int defaultbg;
 extern float alpha;
+extern MouseKey mkeys[];
+extern int ximspot_update_interval;
