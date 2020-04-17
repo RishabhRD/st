@@ -94,7 +94,7 @@ unsigned int tabspaces = 8;
 
 /* bg opacity */
 float alpha = 0.90;           //< alpha value used when the window is focused.
-float alphaUnfocussed = 0.85; //< alpha value used when the focus is lost
+float alphaUnfocussed = 0.88; //< alpha value used when the focus is lost
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
@@ -266,7 +266,7 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_J,           zoom,           {.f = -1} },
 	{ TERMMOD,              XK_U,           zoom,           {.f = +2} },
 	{ TERMMOD,              XK_D,           zoom,           {.f = -2} },
-	{ MODKEY,               XK_u,           externalpipe,   {.v = openurlcmd } },
+	{ ControlMask,               XK_u,           externalpipe,   {.v = openurlcmd } },
 	{ MODKEY,               XK_y,           externalpipe,   {.v = copyurlcmd } },
 	{ MODKEY,               XK_o,           externalpipe,   {.v = copyoutput } },
 	{ MODKEY,              XK_Escape,      keyboard_select,{ 0 } },
