@@ -198,6 +198,7 @@ ResourcePref resources[] = {
 		{ "cwscale",      FLOAT,   &cwscale },
 		{ "chscale",      FLOAT,   &chscale },
 		{ "alpha",        FLOAT,   &alpha },
+		{ "alphaUnfocussed",        FLOAT,   &alphaUnfocussed },
 		{ "ximspot_update_interval", INTEGER, &ximspot_update_interval },
 };
 
