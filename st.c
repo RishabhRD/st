@@ -2911,8 +2911,11 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 				selclear();
 				sel_line_state = 0;
 			}
-			else
+			else{
+				sel_line_state = 0;
+				type = 1;
 				selstart(term.c.x, term.c.y, 0);
+			}
 			set_notifmode(selectsearch_mode ^= 1, ksym);
 			break;
 		case XK_V :
