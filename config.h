@@ -267,9 +267,9 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_J,           zoom,           {.f = -1} },
 	{ TERMMOD,              XK_U,           zoom,           {.f = +2} },
 	{ TERMMOD,              XK_D,           zoom,           {.f = -2} },
-	{ ControlMask,               XK_u,           externalpipe,   {.v = openurlcmd } },
-	{ MODKEY,               XK_y,           externalpipe,   {.v = copyurlcmd } },
-	{ MODKEY,               XK_o,           externalpipe,   {.v = copyoutput } },
+	{ ControlMask|MODKEY,               XK_u,           externalpipe,   {.v = openurlcmd } },
+	{ MODKEY|ControlMask,               XK_y,           externalpipe,   {.v = copyurlcmd } },
+	{ MODKEY|ControlMask,               XK_o,           externalpipe,   {.v = copyoutput } },
 	{ MODKEY,              XK_Escape,      keyboard_select,{ 0 } },
 };
 
