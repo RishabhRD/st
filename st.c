@@ -2951,6 +2951,11 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			}
 			sel_line_state = 0;
 			selclear();
+			set_notifmode(4, ksym);
+			term.c.x = cu.x, term.c.y = cu.y;
+			select_or_drawcursor(selectsearch_mode = 0, type);
+			in_use = quant = 0;
+			return MODE_KBDSELECT;
 		case XK_Escape :
 			if ( !in_use ){
 				sel_line_state = 0;
@@ -2958,6 +2963,11 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			}
 			sel_line_state = 0;
 			selclear();
+			set_notifmode(4, ksym);
+			term.c.x = cu.x, term.c.y = cu.y;
+			select_or_drawcursor(selectsearch_mode = 0, type);
+			in_use = quant = 0;
+			return MODE_KBDSELECT;
 		case XK_y:
 			set_notifmode(4, ksym);
 			term.c.x = cu.x, term.c.y = cu.y;
