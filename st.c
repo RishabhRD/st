@@ -2870,64 +2870,86 @@ int isInSeparator(Rune u){
 	}
 	return 0;
 }
-void getNewVimWord(int considerSymbol){
-	int oX = term.c.x+1;
-	if(oX>=term.col) goto nextLineLabel;
-	int oY = term.c.y;
-	int lineSeparated = 0;
-	int spaceEncountered = 0;
-	for( ; oX<term.col;oX++){
-		if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+int isSpace(Rune u){
+	if(u == 0 || u == ' ' || u == '\t') return 1;
+	return 0;
+}
+void getNewVimWord(int considerSymbol,int selectsearch_mode,int type,int quan){
+	if(quan==0) quan=1;
+loopstart:
+	while(quan--){
+		int oX = term.c.x+1;
+		int oY = term.c.y;
+		if(oX>=term.col) goto nextLineLabel;
+		int lineSeparated = 0;
+		int spaceEncountered = 0;
+		if((oX-1)>=0 && (isSpace(term.line[oY][oX-1].u) || (considerSymbol && isInSeparator(term.line[oY][oX-1].u))) && !isSpace(term.line[oY][oX].u)){
 			term.c.x = oX;
 			term.c.y = oY;
-			xdrawcursor(oX, oY, term.line[term.c.y][oX],
-					term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
-			return;
+			break;
 		}
-		if(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0){
-			spaceEncountered = 1;
-		}
-		if(spaceEncountered && (!(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0))){
-			term.c.x = oX;
-			term.c.y = oY;
-			xdrawcursor(oX, oY, term.line[term.c.y][oX],
-					term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
-			return;
-		}
+		for( ; oX<term.col;oX++){
+			if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+				term.c.x = oX;
+				term.c.y = oY;
+				goto loopstart;
+			}
+			if(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0){
+				spaceEncountered = 1;
+			}
+			if(spaceEncountered && (!(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0))){
+				term.c.x = oX;
+				term.c.y = oY;
+				goto loopstart;
+			}
 
-	}
+		}
 nextLineLabel:
-	oX = 0;
-	oY++;
-	if(oY>term.bot){
+		oX = 0;
+		oY++;
+		if(oY>term.bot){
+			break;
+		}
+		if((oX-1)>=0 && (isSpace(term.line[oY][oX-1].u) || (considerSymbol && isInSeparator(term.line[oY][oX-1].u)))){
+			term.c.x = oX;
+			term.c.y = oY;
+			break;
+		}
+		for( ; oX<term.col;oX++){
+			if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+				term.c.x = oX;
+				term.c.y = oY;
+				goto loopstart;
+			}
+			if(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0){
+				spaceEncountered = 1;
+			}
+			if(spaceEncountered && (!(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0))){
+				term.c.x = oX;
+				term.c.y = oY;
+				goto loopstart;
+			}
+
+		}
+		term.c.x = 0;
+		term.c.y = oY;
+	}
+	select_or_drawcursor(selectsearch_mode,type);
+}
+void getPrevVimWord(int considerSymbol,int selectsearch_mode,int type){
+	int oX = term.c.x - 1;
+	int oY = term.c.y;
+	if(oX<0) goto prevLineLabel;
+	if(isInSeparator(term.line[oY][oX].u)){
+		term.c.x = oX;
+		term.c.y = oY;
+		xdrawcursor(oX, oY, term.line[oY][oX],
+				term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
 		return;
 	}
-	for( ; oX<term.col;oX++){
-		if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
-			term.c.x = oX;
-			term.c.y = oY;
-			xdrawcursor(oX, oY, term.line[oY][oX],
-					term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
-			return;
-		}
-		if(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0){
-			spaceEncountered = 1;
-		}
-		if(spaceEncountered && (!(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0))){
-			term.c.x = oX;
-			term.c.y = oY;
-			xdrawcursor(oX, oY, term.line[oY][oX],
-					term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
-			return;
-		}
-
-	}
-	term.c.x = 1;
-	term.c.y = oY;
-	xdrawcursor(1, oY, term.line[oY][oX],
-			term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
+prevLineLabel:
+	return;
 }
-
 int trt_kbdselect(KeySym ksym, char *buf, int len) {
 	static TCursor cu;
 	static Rune target[64];
@@ -2976,10 +2998,10 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			set_notifmode(0, ksym);
 			return MODE_KBDSELECT;
 		case XK_W :
-			getNewVimWord(0);
+			getNewVimWord(0,selectsearch_mode,type,quant);
 			break;
 		case XK_w :
-			getNewVimWord(1);
+			getNewVimWord(1,selectsearch_mode,type,quant);
 			break;
 		case XK_v :
 			if ( selectsearch_mode & 1 ){
