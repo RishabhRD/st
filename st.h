@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <sys/types.h>
+#include <X11/Xlib.h>
 
 /* macros */
 #define MIN(a, b)		((a) < (b) ? (a) : (b))

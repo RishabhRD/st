@@ -2830,7 +2830,7 @@ void set_notifmode(int type, KeySym ksym) {
 void select_or_drawcursor(int selectsearch_mode, int type) {
 	int done = 0;
 
-	if ( selectsearch_mode & 1 ) {
+	if ( (selectsearch_mode & 1) || (selectsearch_mode & 4)) {
 		if(type == SEL_LINE)
 			selextend(term.col-1,term.c.y,type,done);
 		else
@@ -3060,7 +3060,8 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 	static Rune target[64];
 	static int type = 1, ptarget, in_use;
 	static int sens, quant;
-	static char selectsearch_mode;
+	static char selectsearch_mode; // 1-> select; 2->search 4->findMode
+	static char findMode; // 1->f 2->F 4->t 8->T
 	int i, bound, *xy;
 	int cur;
 	Glyph* line;
@@ -3095,6 +3096,42 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 		drawregion(0, term.bot, term.col, term.bot + 1);
 		return 0;
 	}
+	if(selectsearch_mode & 4){
+		char* keyString = XKeysymToString(ksym);
+		char key;
+		if( ksym == XK_Return || ksym == XK_Escape || ksym == XK_Control_L || ksym == XK_Control_R || ksym == XK_Alt_L || ksym == XK_Alt_R){
+			selectsearch_mode = 1;
+			return 0;
+		}
+		if(ksym == XK_Shift_L || ksym == XK_Shift_R) return 0;
+		if(strlen(keyString)!=1) {
+			return 0;
+		}
+		selectsearch_mode = 1;
+		key = keyString[0];
+		if(findMode ==  0){
+			return 0;
+		}else if((findMode&1) || (findMode&4)){
+			for(int curX = term.c.x + 1; curX<term.col;curX++){
+				if(term.line[term.c.y][curX].u == key){
+					if(findMode&1) term.c.x = curX;
+					else term.c.x = curX-1;
+					select_or_drawcursor(selectsearch_mode,type);
+					break;
+				}
+			}
+		}else if((findMode&2) || (findMode&8)){
+			for(int curX = term.c.x-1;curX>=0;curX--){
+				if(term.line[term.c.y][curX].u == key){
+					if(findMode&2) term.c.x = curX;
+					else term.c.x = curX+1;
+					select_or_drawcursor(selectsearch_mode,type);
+					break;
+				}
+			}
+		}
+		return 0;
+	}
 
 	switch ( ksym ) {
 		case -1 :
@@ -3102,6 +3139,22 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			cu.x = term.c.x, cu.y = term.c.y;
 			set_notifmode(0, ksym);
 			return MODE_KBDSELECT;
+		case XK_f:
+			selectsearch_mode = 4;
+			findMode = 1;
+			break;
+		case XK_F:
+			selectsearch_mode = 4;
+			findMode = 2;
+			break;
+		case XK_t:
+			selectsearch_mode = 4;
+			findMode = 4;
+			break;
+		case XK_T:
+			selectsearch_mode = 4;
+			findMode = 8;
+			break;
 		case XK_H:
 			term.c.y = 0;
 			select_or_drawcursor(selectsearch_mode,type);
@@ -3157,7 +3210,7 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			}
 			set_notifmode(selectsearch_mode ^= 1, ksym);
 			break;
-		case XK_t :
+		case XK_s :
 			selextend(term.c.x, term.c.y, type ^= 3, i = 0);  /* 2 fois */
 			selextend(term.c.x, term.c.y, type, i = 0);
 			break;
