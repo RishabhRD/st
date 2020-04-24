@@ -249,6 +249,9 @@ static uchar utfmask[UTF_SIZ + 1] = {0xC0, 0x80, 0xE0, 0xF0, 0xF8};
 static Rune utfmin[UTF_SIZ + 1] = {       0,    0,  0x80,  0x800,  0x10000};
 static Rune utfmax[UTF_SIZ + 1] = {0x10FFFF, 0x7F, 0x7FF, 0xFFFF, 0x10FFFF};
 
+static char separator[] = {'.','>',',','<','\'','\"',';',':','[',']','{','}','\\','|','+','=','-',')','(',
+	'*','&','^','%','$','#','@','!','`','~'};
+
 	ssize_t
 xwrite(int fd, const char *s, size_t len)
 {
@@ -2861,6 +2864,70 @@ void search(int selectsearch_mode, Rune *target, int ptarget, int incr, int type
 	}
 }
 
+int isInSeparator(Rune u){
+	for(int i=0;i<sizeof(separator)/sizeof(char);i++){
+		if(separator[i] == u) return 1;
+	}
+	return 0;
+}
+void getNewVimWord(int considerSymbol){
+	int oX = term.c.x+1;
+	if(oX>=term.col) goto nextLineLabel;
+	int oY = term.c.y;
+	int lineSeparated = 0;
+	int spaceEncountered = 0;
+	for( ; oX<term.col;oX++){
+		if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+			term.c.x = oX;
+			term.c.y = oY;
+			xdrawcursor(oX, oY, term.line[term.c.y][oX],
+					term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
+			return;
+		}
+		if(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0){
+			spaceEncountered = 1;
+		}
+		if(spaceEncountered && (!(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0))){
+			term.c.x = oX;
+			term.c.y = oY;
+			xdrawcursor(oX, oY, term.line[term.c.y][oX],
+					term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
+			return;
+		}
+
+	}
+nextLineLabel:
+	oX = 0;
+	oY++;
+	if(oY>term.bot){
+		return;
+	}
+	for( ; oX<term.col;oX++){
+		if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+			term.c.x = oX;
+			term.c.y = oY;
+			xdrawcursor(oX, oY, term.line[oY][oX],
+					term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
+			return;
+		}
+		if(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0){
+			spaceEncountered = 1;
+		}
+		if(spaceEncountered && (!(term.line[oY][oX].u == ' ' || term.line[oY][oX].u == '\t' || term.line[oY][oX].u == 0))){
+			term.c.x = oX;
+			term.c.y = oY;
+			xdrawcursor(oX, oY, term.line[oY][oX],
+					term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
+			return;
+		}
+
+	}
+	term.c.x = 1;
+	term.c.y = oY;
+	xdrawcursor(1, oY, term.line[oY][oX],
+			term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
+}
+
 int trt_kbdselect(KeySym ksym, char *buf, int len) {
 	static TCursor cu;
 	static Rune target[64];
@@ -2868,6 +2935,8 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 	static int sens, quant;
 	static char selectsearch_mode;
 	int i, bound, *xy;
+	int cur;
+	Glyph* line;
 	if(sel_line_state) type = 4;
 
 	if ( selectsearch_mode & 2 ) {
@@ -2906,6 +2975,12 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			cu.x = term.c.x, cu.y = term.c.y;
 			set_notifmode(0, ksym);
 			return MODE_KBDSELECT;
+		case XK_W :
+			getNewVimWord(0);
+			break;
+		case XK_w :
+			getNewVimWord(1);
+			break;
 		case XK_v :
 			if ( selectsearch_mode & 1 ){
 				selclear();
