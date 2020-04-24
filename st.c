@@ -3222,7 +3222,25 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			select_or_drawcursor(selectsearch_mode, type);
 			break;
 		case XK_dollar :
+			for(int i = term.col-1;i>=0;i--){
+				if(!isSpace(term.line[term.c.y][i].u)){
+					term.c.x = i;
+					goto draw_dollar;
+				}
+			}
 			term.c.x = term.col - 1;
+draw_dollar:
+			select_or_drawcursor(selectsearch_mode, type);
+			break;
+		case XK_asciicircum:
+			for(int i =0;i<term.col;i++){
+				if(!isSpace(term.line[term.c.y][i].u)){
+					term.c.x = i;
+					goto draw_power;
+				}
+			}
+			term.c.x = 0;
+draw_power:
 			select_or_drawcursor(selectsearch_mode, type);
 			break;
 		case XK_Home :

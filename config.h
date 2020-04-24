@@ -270,7 +270,7 @@ static Shortcut shortcuts[] = {
 	{ ControlMask|MODKEY,               XK_u,           externalpipe,   {.v = openurlcmd } },
 	{ MODKEY|ControlMask,               XK_y,           externalpipe,   {.v = copyurlcmd } },
 	{ MODKEY|ControlMask,               XK_o,           externalpipe,   {.v = copyoutput } },
-	{ MODKEY,              XK_Escape,      keyboard_select,{ 0 } },
+	{ MODKEY,              XK_s,      keyboard_select,{ 0 } },
 };
 
 /*
