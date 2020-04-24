@@ -2999,6 +2999,62 @@ onPrevLine:
 	}
 	select_or_drawcursor(selectsearch_mode,type);
 }
+void getNextVimEnd(int considerSymbol,int selectsearch_mode,int type,int quan){
+	if(quan==0) quan = 1;
+loopstart:
+	while(quan -- ){
+		int oX = term.c.x + 1;
+		int oY = term.c.y;
+		int foundLetter = 0;
+		int foundEnd = 0;
+		while(oY<=term.bot){
+			if(oY>term.bot){
+				term.c.x = 0;
+				term.c.y = term.bot;
+				goto printing;
+			}
+			if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+				term.c.x = oX;
+				term.c.y = oY;
+				goto loopstart;
+			}
+			for(; oX<term.col;oX++){
+				if(!isSpace(term.line[oY][oX].u)){
+					foundLetter = 1;
+					break;
+				}
+			}
+			if(foundLetter){
+				if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+					term.c.x = oX;
+					term.c.y = oY;
+					foundEnd = 1;
+					goto loopstart;
+				}
+				for(;oX<term.col;oX++){
+					if(isSpace(term.line[oY][oX].u) || (considerSymbol && isInSeparator(term.line[oY][oX].u))){
+						term.c.x = oX-1;
+						term.c.y = oY;
+						foundEnd = 1;
+						break;
+					}
+				}
+				if(foundEnd){
+					goto loopstart;
+				}else{
+					term.c.x = term.col-1;
+					term.c.y = oY;
+					goto loopstart;
+				}
+			}else{
+				oX = 0;
+				oY++;
+			}
+		}
+	}
+printing:
+	select_or_drawcursor(selectsearch_mode,type);
+}
 int trt_kbdselect(KeySym ksym, char *buf, int len) {
 	static TCursor cu;
 	static Rune target[64];
@@ -3046,6 +3102,12 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			cu.x = term.c.x, cu.y = term.c.y;
 			set_notifmode(0, ksym);
 			return MODE_KBDSELECT;
+		case XK_e:
+			getNextVimEnd(1,selectsearch_mode,type,quant);
+			break;
+		case XK_E:
+			getNextVimEnd(0,selectsearch_mode,type,quant);
+			break;
 		case XK_b :
 			getPrevVimWord(1,selectsearch_mode,type,quant);
 			break;
