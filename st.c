@@ -2936,19 +2936,68 @@ nextLineLabel:
 	}
 	select_or_drawcursor(selectsearch_mode,type);
 }
-void getPrevVimWord(int considerSymbol,int selectsearch_mode,int type){
-	int oX = term.c.x - 1;
-	int oY = term.c.y;
-	if(oX<0) goto prevLineLabel;
-	if(isInSeparator(term.line[oY][oX].u)){
-		term.c.x = oX;
-		term.c.y = oY;
-		xdrawcursor(oX, oY, term.line[oY][oX],
-				term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
-		return;
+void getPrevVimWord(int considerSymbol,int selectsearch_mode,int type,int quan){
+	if(quan == 0) quan = 1;
+	while(quan--){
+		int onPrevLine = 0;
+		int oX = term.c.x - 1;
+		int oY = term.c.y;
+		int foundLetter = 0;
+		int foundStarting = 0;
+		if(oX < 0){
+			onPrevLine = 1;
+		}
+onPrevLine:
+		if(onPrevLine){
+			oX = term.col -1;
+			oY--;
+			if(oY<0) return;
+		}
+		if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+			term.c.x = oX;
+			term.c.y = oY;
+			continue;
+		}
+		for(; oX>=0;oX--){
+			if(!isSpace(term.line[oY][oX].u)){
+				foundLetter = 1;
+				break;
+			}
+		}
+		if(foundLetter){
+			if(considerSymbol && isInSeparator(term.line[oY][oX].u)){
+				term.c.x = oX;
+				term.c.y = oY;
+				foundStarting = 1;
+				continue;
+			}
+			for(;oX>=0;oX--){
+				if(isSpace(term.line[oY][oX].u) || (considerSymbol && isInSeparator(term.line[oY][oX].u))){
+					term.c.x = oX+1;
+					term.c.y = oY;
+					foundStarting = 1;
+					break;
+				}
+			}
+			if(foundStarting){
+				continue;
+			}else{
+				term.c.x = 0;
+				term.c.y = oY;
+				continue;
+			}
+		}else{
+			if(onPrevLine){
+				term.c.x = 0;
+				term.c.y = oY;
+				continue;
+			}else{
+				onPrevLine = 1;
+				goto onPrevLine;
+			}
+		}
 	}
-prevLineLabel:
-	return;
+	select_or_drawcursor(selectsearch_mode,type);
 }
 int trt_kbdselect(KeySym ksym, char *buf, int len) {
 	static TCursor cu;
@@ -2997,6 +3046,12 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			cu.x = term.c.x, cu.y = term.c.y;
 			set_notifmode(0, ksym);
 			return MODE_KBDSELECT;
+		case XK_b :
+			getPrevVimWord(1,selectsearch_mode,type,quant);
+			break;
+		case XK_B :
+			getPrevVimWord(0,selectsearch_mode,type,quant);
+			break;
 		case XK_W :
 			getNewVimWord(0,selectsearch_mode,type,quant);
 			break;
