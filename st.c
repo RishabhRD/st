@@ -3102,6 +3102,18 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			cu.x = term.c.x, cu.y = term.c.y;
 			set_notifmode(0, ksym);
 			return MODE_KBDSELECT;
+		case XK_H:
+			term.c.y = 0;
+			select_or_drawcursor(selectsearch_mode,type);
+			break;
+		case XK_L:
+			term.c.y = term.bot;
+			select_or_drawcursor(selectsearch_mode,type);
+			break;
+		case XK_M:
+			term.c.y = (term.bot)/2;
+			select_or_drawcursor(selectsearch_mode,type);
+			break;
 		case XK_e:
 			getNextVimEnd(1,selectsearch_mode,type,quant);
 			break;
