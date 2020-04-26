@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include <sys/types.h>
-#include <X11/Xlib.h>
 
 /* macros */
 #define MIN(a, b)		((a) < (b) ? (a) : (b))
@@ -85,6 +84,10 @@ typedef struct {
 	const Arg arg;
 } MouseKey;
 
+typedef struct {
+	KeySym key;
+	char sym;
+} KeyMap;
 void die(const char *, ...);
 void redraw(void);
 void draw(void);
