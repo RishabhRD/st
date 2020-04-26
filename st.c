@@ -3165,6 +3165,7 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 	static int sens, quant;
 	static char selectsearch_mode; // 1-> select; 2->search 4->findMode
 	static char findMode; // 1->f 2->F 4->t 8->T
+	static char findChar = 0;
 	int i, bound, *xy;
 	int cur;
 	Glyph* line;
@@ -3211,6 +3212,7 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			selectsearch_mode = 1;
 			return 0;
 		}
+		findChar = key;
 		selectsearch_mode = 1;
 		if(findMode ==  0){
 			return 0;
@@ -3242,6 +3244,29 @@ int trt_kbdselect(KeySym ksym, char *buf, int len) {
 			cu.x = term.c.x, cu.y = term.c.y;
 			set_notifmode(0, ksym);
 			return MODE_KBDSELECT;
+		case XK_semicolon:
+			if(findMode ==  0){
+				break;
+			}else if((findMode&1) || (findMode&4)){
+				for(int curX = term.c.x + 1; curX<term.col;curX++){
+					if(term.line[term.c.y][curX].u == findChar){
+						if(findMode&1) term.c.x = curX;
+						else term.c.x = curX-1;
+						select_or_drawcursor(selectsearch_mode,type);
+						break;
+					}
+				}
+			}else if((findMode&2) || (findMode&8)){
+				for(int curX = term.c.x-1;curX>=0;curX--){
+					if(term.line[term.c.y][curX].u == findChar){
+						if(findMode&2) term.c.x = curX;
+						else term.c.x = curX+1;
+						select_or_drawcursor(selectsearch_mode,type);
+						break;
+					}
+				}
+			}
+			break;
 		case XK_f:
 			selectsearch_mode = 4;
 			findMode = 1;
