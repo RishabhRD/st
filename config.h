@@ -214,7 +214,7 @@ static MouseShortcut mshortcuts[] = {
 
 /* Internal keyboard shortcuts. */
 #define MODKEY Mod1Mask
-#define TERMMOD (ControlMask|ShiftMask)
+#define TERMMOD (MODKEY|ControlMask)
 
 MouseKey mkeys[] = {
 	/* button               mask            function        argument */
@@ -260,13 +260,11 @@ static Shortcut shortcuts[] = {
 	{ MODKEY,               XK_Down,        kscrolldown,    {.i =  1} },
 	{ MODKEY,               XK_u,           kscrollup,      {.i = -1} },
 	{ MODKEY,               XK_d,           kscrolldown,    {.i = -1} },
-	{ TERMMOD,              XK_Up,          zoom,           {.f = +1} },
-	{ TERMMOD,              XK_Down,        zoom,           {.f = -1} },
-	{ MODKEY|ControlMask,               XK_k,           zoom,           {.f = +1} },
-	{ MODKEY|ControlMask,               XK_j,           zoom,           {.f = -1} },
-	{ MODKEY|ControlMask,               XK_u,           externalpipe,   {.v = openurlcmd } },
-	{ MODKEY|ControlMask,               XK_y,           externalpipe,   {.v = copyurlcmd } },
-	{ MODKEY|ControlMask,               XK_o,           externalpipe,   {.v = copyoutput } },
+	{ TERMMOD,               XK_k,           zoom,           {.f = +1} },
+	{ TERMMOD,               XK_j,           zoom,           {.f = -1} },
+	{ TERMMOD,               XK_u,           externalpipe,   {.v = openurlcmd } },
+	{ TERMMOD,               XK_y,           externalpipe,   {.v = copyurlcmd } },
+	{ TERMMOD,               XK_o,           externalpipe,   {.v = copyoutput } },
 	{ MODKEY,              XK_s,      keyboard_select,{ 0 } },
 };
 
