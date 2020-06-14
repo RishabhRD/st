@@ -1,10 +1,12 @@
 !_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
 !_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
-!_TAG_PROGRAM_VERSION	0.0.0	/3fdf28bc/
+!_TAG_PROGRAM_VERSION	0.0.0	/315c3351/
 $(OBJ)	Makefile	/^$(OBJ): config.h config.mk$/;"	t
 -0,0 +1,30	diff/browse.diff	/^@@ -0,0 +1,30 @@$/;"	h	newFile:b/glyph.h
 -0,0 +1,36	diff/browse.diff	/^@@ -0,0 +1,36 @@$/;"	h	newFile:b/normalMode.h
@@ -42,8 +44,10 @@ $(OBJ)	Makefile	/^$(OBJ): config.h config.mk$/;"	t
 -117,6 +128,9	diff/browse.diff	/^@@ -117,6 +128,9 @@ typedef struct {$/;"	h	modifiedFile:a/st.c
 -117,7 +122,7	diff/focus.diff	/^@@ -117,7 +122,7 @@ static const char *colorname[] = {$/;"	h	modifiedFile:a/config.def.h
 -1176,6 +1850,10	diff/browse.diff	/^@@ -1176,6 +1850,10 @@ tmoveto(int x, int y)$/;"	h	modifiedFile:a/st.c
+-118,8 +118,8	diff/st-osc_10_11_12-20200418-66520e1.diff	/^@@ -118,8 +118,8 @@ static const char *colorname[] = {$/;"	h	modifiedFile:a/config.def.h
 -120,3 +120,5	diff/focus.diff	/^@@ -120,3 +120,5 @@ extern char *termname;$/;"	h	modifiedFile:a/st.h
 -120,3 +137,13	diff/browse.diff	/^@@ -120,3 +137,13 @@ extern char *termname;$/;"	h	modifiedFile:a/st.h
+-121,3 +121,4	diff/st-osc_10_11_12-20200418-66520e1.diff	/^@@ -121,3 +121,4 @@ extern char *termname;$/;"	h	modifiedFile:a/st.h
 -125,8 +107,6	diff/browse.diff	/^@@ -125,8 +107,6 @@ void *xmalloc(size_t);$/;"	h	modifiedFile:a/st.h
 -1277,689 +1168,6	diff/browse.diff	/^@@ -1277,689 +1168,6 @@ currentLine(int x, int y)$/;"	h	modifiedFile:a/st.c
 -1282,14 +1342,14	diff/scrollback.diff	/^@@ -1282,14 +1342,14 @@ void$/;"	h	modifiedFile:a/st.c
@@ -113,6 +117,7 @@ $(OBJ)	Makefile	/^$(OBJ): config.h config.mk$/;"	t
 -180,12 +180,13	diff/browse.diff	/^@@ -180,12 +180,13 @@ struct NormalModeState {$/;"	h	modifiedFile:a/st.c
 -184,8 +191,8	diff/scrollback.diff	/^@@ -184,8 +191,8 @@ static void tnewline(int);$/;"	h	modifiedFile:a/st.c
 -184,8 +242,8	diff/browse.diff	/^@@ -184,8 +242,8 @@ static void tnewline(int);$/;"	h	modifiedFile:a/st.c
+-1862,12 +1862,23	diff/st-osc_10_11_12-20200418-66520e1.diff	/^@@ -1862,12 +1862,23 @@ strhandle(void)$/;"	h	modifiedFile:a/st.c
 -1870,8 +1908,9	diff/browse.diff	/^@@ -1870,8 +1908,9 @@ run(void)$/;"	h	modifiedFile:a/x.c
 -19,6 +19,7	diff/browse.diff	/^@@ -19,6 +19,7 @@ enum win_mode {$/;"	h	modifiedFile:a/win.h
 -1908,9 +1904,8	diff/browse.diff	/^@@ -1908,9 +1904,8 @@ run(void)$/;"	h	modifiedFile:a/x.c
@@ -400,6 +405,7 @@ IS_SET	st.c	/^#define IS_SET(/;"	d	file:
 IS_SET	x.c	/^#define IS_SET(/;"	d	file:
 IS_TRUECOL	st.h	/^#define IS_TRUECOL(/;"	d
 Key	x.c	/^} Key;$/;"	t	typeref:struct:__anon0b88b7ae0308	file:
+KeyMap	st.h	/^} KeyMap;$/;"	t	typeref:struct:__anon7c9e12e20408
 LEN	st.h	/^#define LEN(/;"	d
 LIBS	config.mk	/^LIBS = -L$(X11LIB) -lm -lrt -lX11 -lutil -lXft -lXrender \\$/;"	m
 LICENSE	st.1	/^.SH LICENSE$/;"	s	title:ST
@@ -513,12 +519,14 @@ __anon7c9e12dd0608	st.c	/^typedef struct {$/;"	s	file:
 __anon7c9e12e20108	st.h	/^typedef struct {$/;"	s
 __anon7c9e12e2020a	st.h	/^typedef union {$/;"	u
 __anon7c9e12e20308	st.h	/^typedef struct {$/;"	s
+__anon7c9e12e20408	st.h	/^typedef struct {$/;"	s
 a/Makefile	diff/browse.diff	/^--- a\/Makefile$/;"	m
 a/config.def.h	diff/browse.diff	/^--- a\/config.def.h$/;"	m
 a/config.def.h	diff/focus.diff	/^--- a\/config.def.h$/;"	m
 a/config.def.h	diff/mouse-scrollback.diff	/^--- a\/config.def.h$/;"	m
 a/config.def.h	diff/scrollback.diff	/^--- a\/config.def.h$/;"	m
 a/config.def.h	diff/select.diff	/^--- a\/config.def.h$/;"	m
+a/config.def.h	diff/st-osc_10_11_12-20200418-66520e1.diff	/^--- a\/config.def.h$/;"	m
 a/config.mk	diff/focus.diff	/^--- a\/config.mk$/;"	m
 a/dynamicArray.h	diff/browse.diff	/^--- a\/dynamicArray.h$/;"	m
 a/error.h	diff/browse.diff	/^--- a\/error.h$/;"	m
@@ -528,11 +536,13 @@ a/st.c	diff/browse.diff	/^--- a\/st.c$/;"	m
 a/st.c	diff/mouse-scrollback.diff	/^--- a\/st.c$/;"	m
 a/st.c	diff/scrollback.diff	/^--- a\/st.c$/;"	m
 a/st.c	diff/select.diff	/^--- a\/st.c$/;"	m
+a/st.c	diff/st-osc_10_11_12-20200418-66520e1.diff	/^--- a\/st.c$/;"	m
 a/st.h	diff/browse.diff	/^--- a\/st.h$/;"	m
 a/st.h	diff/focus.diff	/^--- a\/st.h$/;"	m
 a/st.h	diff/mouse-scrollback.diff	/^--- a\/st.h$/;"	m
 a/st.h	diff/scrollback.diff	/^--- a\/st.h$/;"	m
 a/st.h	diff/select.diff	/^--- a\/st.h$/;"	m
+a/st.h	diff/st-osc_10_11_12-20200418-66520e1.diff	/^--- a\/st.h$/;"	m
 a/term.h	diff/browse.diff	/^--- a\/term.h$/;"	m
 a/win.h	diff/browse.diff	/^--- a\/win.h$/;"	m
 a/win.h	diff/select.diff	/^--- a\/win.h$/;"	m
@@ -589,7 +599,7 @@ charset	st.c	/^	int charset;  \/* current charset *\/$/;"	m	struct:__anon7c9e12d
 charset	st.c	/^enum charset {$/;"	g	file:
 chscale	config.h	/^static float chscale = 1.0;$/;"	v	typeref:typename:float
 clean	Makefile	/^clean:$/;"	t
-clipboard	x.c	/^	char *primary, *clipboard;$/;"	m	struct:__anon0b88b7ae0708	typeref:typename:char **	file:
+clipboard	x.c	/^	char *primary, *clipboard;$/;"	m	struct:__anon0b88b7ae0708	typeref:typename:char *	file:
 clipcopy	x.c	/^clipcopy(const Arg *dummy)$/;"	f	typeref:typename:void
 clippaste	x.c	/^clippaste(const Arg *dummy)$/;"	f	typeref:typename:void
 cmap	x.c	/^	Colormap cmap;$/;"	m	struct:__anon0b88b7ae0608	typeref:typename:Colormap	file:
@@ -661,7 +671,10 @@ frclen	x.c	/^static int frclen = 0;$/;"	v	typeref:typename:int	file:
 func	st.h	/^	void (*func)(const Arg *);$/;"	m	struct:__anon7c9e12e20308	typeref:typename:void (*)(const Arg *)
 func	x.c	/^	void (*func)(const Arg *);$/;"	m	struct:__anon0b88b7ae0108	typeref:typename:void (*)(const Arg *)	file:
 gc	x.c	/^	GC gc;$/;"	m	struct:__anon0b88b7ae0908	typeref:typename:GC	file:
-getNewVimWord	st.c	/^void getNewVimWord(){$/;"	f	typeref:typename:void
+getKeyMap	st.c	/^char getKeyMap(KeySym sym){$/;"	f	typeref:typename:char
+getNewVimWord	st.c	/^void getNewVimWord(int considerSymbol,int selectsearch_mode,int type,int quan){$/;"	f	typeref:typename:void
+getNextVimEnd	st.c	/^void getNextVimEnd(int considerSymbol,int selectsearch_mode,int type,int quan){$/;"	f	typeref:typename:void
+getPrevVimWord	st.c	/^void getPrevVimWord(int considerSymbol,int selectsearch_mode,int type,int quan){$/;"	f	typeref:typename:void
 getsel	st.c	/^getsel(void)$/;"	f	typeref:typename:char *
 glyph_attribute	st.h	/^enum glyph_attribute {$/;"	g
 gm	x.c	/^	int gm; \/* geometry mask *\/$/;"	m	struct:__anon0b88b7ae0608	typeref:typename:int	file:
@@ -679,10 +692,12 @@ ignoremod	config.h	/^static uint ignoremod = Mod2Mask|XK_SWITCH_MOD;$/;"	v	typer
 install	Makefile	/^install: st$/;"	t
 iofd	st.c	/^static int iofd = 1;$/;"	v	typeref:typename:int	file:
 isInSeparator	st.c	/^int isInSeparator(Rune u){$/;"	f	typeref:typename:int
+isSpace	st.c	/^int isSpace(Rune u){$/;"	f	typeref:typename:int
 isfixed	x.c	/^	int isfixed; \/* is fixed geometry? *\/$/;"	m	struct:__anon0b88b7ae0608	typeref:typename:int	file:
-iso14755	st.c	/^iso14755(const Arg *arg)$/;"	f	typeref:typename:void
 k	x.c	/^	KeySym k;$/;"	m	struct:__anon0b88b7ae0308	typeref:typename:KeySym	file:
 key	config.h	/^static Key key[] = {$/;"	v	typeref:typename:Key[]
+key	st.h	/^	KeySym key;$/;"	m	struct:__anon7c9e12e20408	typeref:typename:KeySym
+keyMap	st.c	/^static KeyMap keyMap[] = {$/;"	v	typeref:typename:KeyMap[]	file:
 keyboard_select	x.c	/^void keyboard_select(const Arg *dummy) {$/;"	f	typeref:typename:void
 keysym	x.c	/^	KeySym keysym;$/;"	m	struct:__anon0b88b7ae0108	typeref:typename:KeySym	file:
 kmap	x.c	/^kmap(KeySym k, uint state)$/;"	f	typeref:typename:char *
@@ -802,6 +817,7 @@ strparse	st.c	/^strparse(void)$/;"	f	typeref:typename:void
 strreset	st.c	/^strreset(void)$/;"	f	typeref:typename:void
 stty	st.c	/^stty(char **args)$/;"	f	typeref:typename:void
 stty_args	config.h	/^char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";$/;"	v	typeref:typename:char *
+sym	st.h	/^	char sym;$/;"	m	struct:__anon7c9e12e20408	typeref:typename:char
 t	x.c	/^	int l, t; \/* left and top offset *\/$/;"	m	struct:__anon0b88b7ae0608	typeref:typename:int	file:
 tabs	st.c	/^	int *tabs;$/;"	m	struct:__anon7c9e12dd0408	typeref:typename:int *	file:
 tabspaces	config.h	/^unsigned int tabspaces = 8;$/;"	v	typeref:typename:unsigned int

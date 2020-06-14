@@ -98,22 +98,22 @@ float alphaUnfocussed = 0.88; //< alpha value used when the focus is lost
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
-	"#282828", /* hard contrast: #1d2021 / soft contrast: #32302f */
-	"#cc241d",
-	"#98971a",
-	"#d79921",
-	"#458588",
-	"#b16286",
-	"#689d6a",
-	"#a89984",
-	"#928374",
-	"#fb4934",
-	"#b8bb26",
-	"#fabd2f",
-	"#83a598",
-	"#d3869b",
-	"#8ec07c",
-	"#ebdbb2",
+	"#282828", /* hard contrast: #1d2021 / soft contrast: #32302f */ //0
+	"#cc241d", //1
+	"#98971a", //2
+	"#d79921", //3
+	"#458588", //4
+	"#b16286", //5
+	"#689d6a", //6
+	"#a89984", //7
+	"#928374", //8
+	"#fb4934", //9
+	"#b8bb26", //10
+	"#fabd2f", //11
+	"#83a598", //12
+	"#d3869b", //13
+	"#8ec07c", //14
+	"#ebdbb2", //15
 	[255] = 0,
 	/* more colors can be added after 255 to use with DefaultXX */
 	"#add8e6", /* 256 -> cursor */
