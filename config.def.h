@@ -244,6 +244,16 @@ static MouseShortcut mshortcuts[] = {
 #define AltMask Mod1Mask
 #define TERMMOD (ControlMask|MODKEY)
 
+static char *openurlcmd[] = { "/bin/sh", "-c",
+    "sed 's/.*│//g' | tr -d '\n' | grep -aEo '(((http|https)://|www\\.)[a-zA-Z0-9.]*[:]?[a-zA-Z0-9./@&%?$#=_-]*)|((magnet:\\?xt=urn:btih:)[a-zA-Z0-9]*)'| uniq | sed 's/^www./http:\\/\\/www\\./g' | dmenu -w $(xdotool getactivewindow) -i -p 'Follow which url?' -l 10 | xargs -r xdg-open",
+    "externalpipe", NULL };
+
+static char *copyurlcmd[] = { "/bin/sh", "-c",
+    "sed 's/.*│//g' | tr -d '\n' | grep -aEo '(((http|https)://|www\\.)[a-zA-Z0-9.]*[:]?[a-zA-Z0-9./@&%?$#=_-]*)|((magnet:\\?xt=urn:btih:)[a-zA-Z0-9]*)' | uniq | sed 's/^www./http:\\/\\/www\\./g' | dmenu -w $(xdotool getactivewindow) -i -p 'Copy which url?' -l 10 | tr -d '\n' | xclip -selection clipboard",
+    "externalpipe", NULL };
+
+static char *copyoutput[] = { "/bin/sh", "-c", "st-copyout", "externalpipe", NULL };
+
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
 	{ AltMask,              XK_s,           normalMode,     {.i =  0} },
@@ -251,16 +261,21 @@ static Shortcut shortcuts[] = {
 	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-	{ TERMMOD,              XK_k,       zoom,           {.f = +1} },
-	{ TERMMOD,              XK_j,        zoom,           {.f = -1} },
-	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
-	{ MODKEY,              XK_c,           clipcopy,       {.i =  0} },
-	{ MODKEY,              XK_v,           clippaste,      {.i =  0} },
-	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+	{ TERMMOD,              XK_k,           zoom,           {.f = +1} },
+	{ TERMMOD,              XK_j,           zoom,           {.f = -1} },
+	{ TERMMOD,              XK_KP_0,        zoomreset,      {.f =  0} },
+	{ MODKEY,               XK_c,           clipcopy,       {.i =  0} },
+	{ MODKEY,               XK_v,           clippaste,      {.i =  0} },
+	{ TERMMOD,              XK_v,           selpaste,       {.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-	{ MODKEY,            XK_k,     kscrollup,      {.i = -1} },
-	{ MODKEY,            XK_j,   kscrolldown,    {.i = -1} },
+	{ MODKEY,               XK_k,     	kscrollup,      {.i =  1} },
+	{ MODKEY,            	XK_j,   	kscrolldown,    {.i =  1} },
+	{ MODKEY,            	XK_u,     	kscrollup,      {.i = -1} },
+	{ MODKEY,            	XK_d,   	kscrolldown,    {.i = -1} },
+	{ TERMMOD,              XK_u,           externalpipe,   {.v = openurlcmd } },
+	{ TERMMOD,              XK_y,           externalpipe,   {.v = copyurlcmd } },
+	{ TERMMOD,              XK_o,           externalpipe,   {.v = copyoutput } },
 };
 
 /*
