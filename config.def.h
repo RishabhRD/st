@@ -178,7 +178,7 @@ static unsigned int highlightBg = 160;
 static unsigned int highlightFg = 15;
 /// Colors for highlighting the current cursor position (row + col) in normal
 /// mode [Vim Browse].
-static unsigned int currentBg = 258;
+static unsigned int currentBg = 0;
 static unsigned int currentFg = 259;
 
 /*
