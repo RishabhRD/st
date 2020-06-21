@@ -12,6 +12,8 @@ This is 0.8.4 build of st with important patches.
 
 - alpha (transparency)
 
+- alpha-focus (for visual feedback while switching focus)
+
 - OSC (cursor support)
 
 - font2 (multiple fonts for emoji)
