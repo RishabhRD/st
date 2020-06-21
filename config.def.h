@@ -178,8 +178,8 @@ static unsigned int highlightBg = 160;
 static unsigned int highlightFg = 15;
 /// Colors for highlighting the current cursor position (row + col) in normal
 /// mode [Vim Browse].
-static unsigned int currentBg = 8;
-static unsigned int currentFg = 15;
+static unsigned int currentBg = 258;
+static unsigned int currentFg = 259;
 
 /*
  * Force mouse select/shortcuts while mask is active (when MODE_MOUSE is set).
