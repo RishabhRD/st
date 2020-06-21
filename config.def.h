@@ -62,6 +62,12 @@ static unsigned int xfps = 120;
 static unsigned int actionfps = 30;
 
 /*
+ * Synchronized-Update timeout in ms
+ * https://gitlab.com/gnachman/iterm2/-/wikis/synchronized-updates-spec
+ */
+static uint su_timeout = 200;
+
+/*
  * blinking timeout (set to 0 to disable blinking) for the terminal blinking
  * attribute.
  */
