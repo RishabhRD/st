@@ -2,3 +2,5 @@ st
 diff/*
 *.o
 config.h
+*.orig
+*.rej
