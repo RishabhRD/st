@@ -28,6 +28,8 @@ This is 0.8.4 build of st with important patches.
 
 - anysize (for having size similar to other windows)
 
+- xclearwin (for clean borders)
+
 
 ## Keyboard shortcuts
 
