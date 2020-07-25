@@ -199,6 +199,15 @@ static MouseShortcut mshortcuts[] = {
 #define MODKEY Mod1Mask
 #define AltMask Mod1Mask
 #define TERMMOD (Mod1Mask|ControlMask)
+static char *openurlcmd[] = { "/bin/sh", "-c",
+    "sed 's/.*│//g' | tr -d '\n' | grep -aEo '(((http|https)://|www\\.)[a-zA-Z0-9.]*[:]?[a-zA-Z0-9./@&%?$#=_-]*)|((magnet:\\?xt=urn:btih:)[a-zA-Z0-9]*)'| uniq | sed 's/^www./http:\\/\\/www\\./g' | dmenu -w $(xdotool getactivewindow) -i -p 'Follow which url?' -l 10 | xargs -r xdg-open",
+    "externalpipe", NULL };
+
+static char *copyurlcmd[] = { "/bin/sh", "-c",
+    "sed 's/.*│//g' | tr -d '\n' | grep -aEo '(((http|https)://|www\\.)[a-zA-Z0-9.]*[:]?[a-zA-Z0-9./@&%?$#=_-]*)|((magnet:\\?xt=urn:btih:)[a-zA-Z0-9]*)' | uniq | sed 's/^www./http:\\/\\/www\\./g' | dmenu -w $(xdotool getactivewindow) -i -p 'Copy which url?' -l 10 | tr -d '\n' | xclip -selection clipboard",
+    "externalpipe", NULL };
+
+static char *copyoutput[] = { "/bin/sh", "-c", "st-copyout", "externalpipe", NULL };
 
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
@@ -212,12 +221,15 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_0, 	        zoomreset,      {.f =  0} },
 	{ Mod1Mask,             XK_c,           clipcopy,       {.i =  0} },
 	{ Mod1Mask,             XK_v,           clippaste,      {.i =  0} },
-	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+	{ Mod1Mask,             XK_Y,           selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
 	{ Mod1Mask,             XK_k, 	        kscrollup,      {.i = -1} },
 	{ Mod1Mask,             XK_j, 		    kscrolldown,    {.i = -1} },
 	{ Mod1Mask,             XK_u, 	        kscrollup,      {.i = -1} },
 	{ Mod1Mask,             XK_d, 		    kscrolldown,    {.i = -1} },
+	{ TERMMOD,              XK_u,           externalpipe,   {.v = openurlcmd } },
+	{ TERMMOD,              XK_y,           externalpipe,   {.v = copyurlcmd } },
+	{ TERMMOD,              XK_o,           externalpipe,   {.v = copyoutput } },
 };
 
 /*
