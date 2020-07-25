@@ -5,7 +5,10 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
+static char *font = "monospace:size=11";
+/* Spare fonts */
+static char *font2[] = { "Inconsolata:pixelsize=11:antialias=true:autohint=true","SymbolsNerdFont:pixelsize=13:antialias=true:autohint=true","LohitDevanagari:pixelsize=13:antialias=true:autohint=true" };
+
 static int borderpx = 2;
 
 /*
@@ -208,8 +211,8 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_k,   	    zoom,           {.f = +1} },
 	{ TERMMOD,              XK_j, 	        zoom,           {.f = -1} },
 	{ TERMMOD,              XK_0, 	        zoomreset,      {.f =  0} },
-	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
-	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
+	{ Mod1Mask,             XK_c,           clipcopy,       {.i =  0} },
+	{ Mod1Mask,             XK_v,           clippaste,      {.i =  0} },
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
 	{ Mod1Mask,             XK_k, 	        kscrollup,      {.i = -1} },
