@@ -26,8 +26,6 @@ This is 0.8.4 build of st with important patches.
 
 - w3m and sync (trying image preview in lf!!)
 
-- anysize (for having size similar to other windows)
-
 - xclearwin (for clean borders)
 
 
