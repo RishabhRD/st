@@ -68,20 +68,18 @@ typedef union {
 void die(const char *, ...);
 void redraw(void);
 void draw(void);
+
 int currentLine(int, int);
-void normalMode(Arg const *);
-
-
 void kscrolldown(const Arg *);
 void kscrollup(const Arg *);
-void externalpipe(const Arg *);
+void normalMode(Arg const *);
+
 void printscreen(const Arg *);
 void printsel(const Arg *);
 void sendbreak(const Arg *);
 void toggleprinter(const Arg *);
 
 int tattrset(int);
-int tisaltscr(void);
 void tnew(int, int);
 void tresize(int, int);
 void tsetdirtattr(int);
@@ -123,5 +121,3 @@ extern char *termname;
 extern unsigned int tabspaces;
 extern unsigned int defaultfg;
 extern unsigned int defaultbg;
-extern float alpha, alphaUnfocused;
-extern unsigned int defaultcs;
