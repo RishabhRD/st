@@ -81,7 +81,7 @@ static unsigned int cursorthickness = 2;
 static int bellvolume = 0;
 
 /* default TERM value */
-char *termname = "st-256color";
+char *termname = "xterm-256color";
 
 /*
  * spaces per tab
@@ -100,7 +100,8 @@ char *termname = "st-256color";
  */
 unsigned int tabspaces = 8;
 
-/* Terminal colors (16 first used in escape sequence) */
+/* Gruvbox */
+
 static const char *colorname[] = {
 	"#282828",
 	"#cc241d",
@@ -127,6 +128,34 @@ static const char *colorname[] = {
 	"#1d2021",
 	"#ebdbb2",
 };
+
+/* Black */
+
+/* static const char *colorname[] = { */
+/* 	"#2E3436", */
+/* 	"#a40000", */
+/* 	"#4E9A06", */
+/* 	"#C4A000", */
+/* 	"#3465A4", */
+/* 	"#75507B", */
+/* 	"#ce5c00", */
+/* 	"#babdb9", */
+/* 	"#555753", */
+/* 	"#EF2929", */
+/* 	"#8AE234", */
+/* 	"#FCE94F", */
+/* 	"#729FCF", */
+/* 	"#AD7FA8", */
+/* 	"#fcaf3e", */
+/* 	"#EEEEEC", */
+/* 	[255] = 0, */
+
+/* 	/1* more colors can be added after 255 to use with DefaultXX *1/ */
+/* 	"#cccccc", */
+/* 	"#555555", */
+/* 	"#000000", */
+/* 	"#ffffff", */
+/* }; */
 
 
 /*
