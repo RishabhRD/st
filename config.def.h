@@ -6,9 +6,6 @@
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
 static char *font = "monospace:size=12";
-/* Spare fonts */
-static char *font2[] = { "Inconsolata:pixelsize=11:antialias=true:autohint=true","SymbolsNerdFont:pixelsize=13:antialias=true:autohint=true","LohitDevanagari:pixelsize=13:antialias=true:autohint=true" };
-
 static int borderpx = 2;
 
 /*
@@ -59,10 +56,6 @@ int allowwindowops = 0;
 static double minlatency = 8;
 static double maxlatency = 33;
 
-/* frames per second st should at maximum draw to the screen */
-static unsigned int xfps = 120;
-static unsigned int actionfps = 30;
-
 /*
  * blinking timeout (set to 0 to disable blinking) for the terminal blinking
  * attribute.
@@ -99,6 +92,8 @@ char *termname = "st-256color";
  *	stty tabs
  */
 unsigned int tabspaces = 8;
+
+/* Terminal colors (16 first used in escape sequence) */
 
 /* Gruvbox */
 
@@ -157,7 +152,6 @@ static const char *colorname[] = {
 	"#ffffff",
 };
 
-
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
@@ -195,14 +189,6 @@ static unsigned int mousebg = 0;
  * doesn't match the ones requested.
  */
 static unsigned int defaultattr = 11;
-/// Colors for the entities that are 'highlighted' in normal mode (search
-/// results currently on screen) [Vim Browse].
-static unsigned int highlightBg = 160;
-static unsigned int highlightFg = 15;
-/// Colors for highlighting the current cursor position (row + col) in normal
-/// mode [Vim Browse].
-static unsigned int currentBg = 8;
-static unsigned int currentFg = 15;
 
 /*
  * Force mouse select/shortcuts while mask is active (when MODE_MOUSE is set).
@@ -220,13 +206,14 @@ static MouseShortcut mshortcuts[] = {
 	{ XK_ANY_MOD,           Button4, kscrollup,      {.i = 1},      0, /* !alt */ -1 },
 	{ XK_ANY_MOD,           Button5, kscrolldown,    {.i = 1},      0, /* !alt */ -1 },
 	{ XK_ANY_MOD,           Button2, selpaste,       {.i = 0},      1 },
+	{ ShiftMask,            Button4, ttysend,        {.s = "\033[5;2~"} },
 	{ XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },
+	{ ShiftMask,            Button5, ttysend,        {.s = "\033[6;2~"} },
 	{ XK_ANY_MOD,           Button5, ttysend,        {.s = "\005"} },
 };
 
 /* Internal keyboard shortcuts. */
 #define MODKEY Mod1Mask
-#define AltMask Mod1Mask
 #define TERMMOD (Mod1Mask|ControlMask)
 static char *openurlcmd[] = { "/bin/sh", "-c",
     "sed 's/.*│//g' | tr -d '\n' | grep -aEo '(((http|https)://|www\\.)[a-zA-Z0-9.]*[:]?[a-zA-Z0-9./@&%?$#=_-]*)|((magnet:\\?xt=urn:btih:)[a-zA-Z0-9]*)'| uniq | sed 's/^www./http:\\/\\/www\\./g' | dmenu -w $(xdotool getactivewindow) -i -p 'Follow which url?' -l 10 | xargs -r xdg-open",
@@ -236,29 +223,24 @@ static char *copyurlcmd[] = { "/bin/sh", "-c",
     "sed 's/.*│//g' | tr -d '\n' | grep -aEo '(((http|https)://|www\\.)[a-zA-Z0-9.]*[:]?[a-zA-Z0-9./@&%?$#=_-]*)|((magnet:\\?xt=urn:btih:)[a-zA-Z0-9]*)' | uniq | sed 's/^www./http:\\/\\/www\\./g' | dmenu -w $(xdotool getactivewindow) -i -p 'Copy which url?' -l 10 | tr -d '\n' | xclip -selection clipboard",
     "externalpipe", NULL };
 
-static char *copyoutput[] = { "/bin/sh", "-c", "st-copyout", "externalpipe", NULL };
-
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
-	{ AltMask,              XK_s,           normalMode,     {.i =  0} },
 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
 	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-	{ TERMMOD,              XK_k,   	    zoom,           {.f = +1} },
-	{ TERMMOD,              XK_j, 	        zoom,           {.f = -1} },
-	{ TERMMOD,              XK_0, 	        zoomreset,      {.f =  0} },
-	{ Mod1Mask,             XK_c,           clipcopy,       {.i =  0} },
-	{ Mod1Mask,             XK_v,           clippaste,      {.i =  0} },
-	{ Mod1Mask,             XK_Y,           selpaste,       {.i =  0} },
+	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
+	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
+	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
+	{ Mod1Mask,             XK_C,           clipcopy,       {.i =  0} },
+	{ ControlMask,          XK_v,           clippaste,      {.i =  0} },
+	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-	{ Mod1Mask,             XK_k, 	        kscrollup,      {.i = 1} },
-	{ Mod1Mask,             XK_j, 		    kscrolldown,    {.i = 1} },
-	{ Mod1Mask,             XK_u, 	        kscrollup,      {.i = 5} },
-	{ Mod1Mask,             XK_d, 		    kscrolldown,    {.i = 5} },
+	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
+	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
 	{ TERMMOD,              XK_u,           externalpipe,   {.v = openurlcmd } },
 	{ TERMMOD,              XK_y,           externalpipe,   {.v = copyurlcmd } },
-	{ TERMMOD,              XK_o,           externalpipe,   {.v = copyoutput } },
 };
 
 /*
@@ -530,45 +512,3 @@ static char ascii_printable[] =
 	" !\"#$%&'()*+,-./0123456789:;<=>?"
 	"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
 	"`abcdefghijklmnopqrstuvwxyz{|}~";
-
-
-/// word sepearors normal mode
-/// [Vim Browse].
-char wordDelimSmall[] = " \t!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-char wordDelimLarge[] = " \t"; /// <Word sepearors normal mode (capital W)
-
-/// Shortcusts executed in normal mode (which should not already be in use)
-/// [Vim Browse].
-struct NormalModeShortcuts normalModeShortcuts [] = {
-	{ 'R', "?Building\n" },
-	{ 'r', "/Building\n" },
-	{ 'F', "?: error:\n" },
-	{ 'f', "/: error:\n" },
-	{ 'Q', "?[Leaving vim, starting execution]\n" },
-	{ 'S', "Qf" },
-	{ 'X', "?juli@machine\n" },
-	{ 'x', "/juli@machine\n" },
-};
-
-size_t const amountNormalModeShortcuts = sizeof(normalModeShortcuts) / sizeof(*normalModeShortcuts);
-
-/// Style of the command string visualized in normal mode in the right corner
-/// [Vim Browse].
-Glyph const styleCommand = {' ', ATTR_ITALIC | ATTR_FAINT, 7, 16};
-/// Style of the search string visualized in normal mode in the right corner.
-/// [Vim Browse].
-Glyph const styleSearch = {' ', ATTR_ITALIC | ATTR_BOLD_FAINT, 7, 16};
-
-/// Colors used in normal mode in order to highlight different operations and
-/// empathise the current position on screen  in  the status area [Vim Browse].
-unsigned int bgCommandYank = 11;
-unsigned int bgCommandVisual = 4;
-unsigned int bgCommandVisualLine = 12;
-
-unsigned int fgCommandYank = 232;
-unsigned int fgCommandVisual = 232;
-unsigned int fgCommandVisualLine = 232;
-
-unsigned int bgPos = 15;
-unsigned int fgPos = 16;
-

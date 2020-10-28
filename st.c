@@ -1,10 +1,8 @@
 /* See LICENSE for license details. */
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <math.h>
 #include <pwd.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -19,8 +17,6 @@
 #include <unistd.h>
 #include <wchar.h>
 
-
-#include "term.h"
 #include "st.h"
 #include "win.h"
 
@@ -39,6 +35,7 @@
 #define ESC_ARG_SIZ   16
 #define STR_BUF_SIZ   ESC_BUF_SIZ
 #define STR_ARG_SIZ   ESC_ARG_SIZ
+#define HISTSIZE      2000
 
 /* macros */
 #define IS_SET(flag)		((term.mode & (flag)) != 0)
@@ -46,8 +43,9 @@
 #define ISCONTROLC1(c)		(BETWEEN(c, 0x80, 0x9f))
 #define ISCONTROL(c)		(ISCONTROLC0(c) || ISCONTROLC1(c))
 #define ISDELIM(u)		(u && wcschr(worddelimiters, u))
-#define INTERVAL(x, a, b)	(x) < (a) ? (a) : (x) > (b) ? (b) : (x)
-#define TLINE_HIST(y)           ((y) <= HISTSIZE-term.row+2 ? term.hist[(y)] : term.line[(y-HISTSIZE+term.row-3)])
+#define TLINE(y)		((y) < term.scr ? term.hist[((y) + term.histi - \
+				term.scr + HISTSIZE + 1) % HISTSIZE] : \
+				term.line[(y) - term.scr])
 
 enum term_mode {
 	MODE_WRAP        = 1 << 0,
@@ -90,17 +88,17 @@ enum escape_state {
 	ESC_UTF8       = 64,
 };
 
-/*typedef struct {*/
-	/*Glyph attr; [> current char attributes <]*/
-	/*int x;*/
-	/*int y;*/
-	/*char state;*/
-/*} TCursor;*/
+typedef struct {
+	Glyph attr; /* current char attributes */
+	int x;
+	int y;
+	char state;
+} TCursor;
 
-/*typedef struct {*/
-	/*int mode;*/
-	/*int type;*/
-	/*int snap;*/
+typedef struct {
+	int mode;
+	int type;
+	int snap;
 	/*
 	 * Selection variables:
 	 * nb – normalized coordinates of the beginning of the selection
@@ -108,33 +106,36 @@ enum escape_state {
 	 * ob – original coordinates of the beginning of the selection
 	 * oe – original coordinates of the end of the selection
 	 */
-	/*struct {*/
-		/*int x, y;*/
-	/*} nb, ne, ob, oe;*/
+	struct {
+		int x, y;
+	} nb, ne, ob, oe;
 
-	/*int alt;*/
-/*} Selection;*/
+	int alt;
+} Selection;
 
-/*[> Internal representation of the screen <]*/
-/*typedef struct {*/
-	/*int row;      [> nb row <]*/
-	/*int col;      [> nb col <]*/
-	/*Line *line;   [> screen <]*/
-	/*Line *alt;    [> alternate screen <]*/
-	/*int *dirty;   [> dirtyness of lines <]*/
-	/*TCursor c;    [> cursor <]*/
-	/*int ocx;      [> old cursor col <]*/
-	/*int ocy;      [> old cursor row <]*/
-	/*int top;      [> top    scroll limit <]*/
-	/*int bot;      [> bottom scroll limit <]*/
-	/*int mode;     [> terminal mode flags <]*/
-	/*int esc;      [> escape state flags <]*/
-	/*char trantbl[4]; [> charset table translation <]*/
-	/*int charset;  [> current charset <]*/
-	/*int icharset; [> selected charset for sequence <]*/
-	/*int *tabs;*/
-	/*Rune lastc;   [> last printed char outside of sequence, 0 if control <]*/
-/*} Term;*/
+/* Internal representation of the screen */
+typedef struct {
+	int row;      /* nb row */
+	int col;      /* nb col */
+	Line *line;   /* screen */
+	Line *alt;    /* alternate screen */
+	Line hist[HISTSIZE]; /* history buffer */
+	int histi;    /* history index */
+	int scr;      /* scroll back */
+	int *dirty;   /* dirtyness of lines */
+	TCursor c;    /* cursor */
+	int ocx;      /* old cursor col */
+	int ocy;      /* old cursor row */
+	int top;      /* top    scroll limit */
+	int bot;      /* bottom scroll limit */
+	int mode;     /* terminal mode flags */
+	int esc;      /* escape state flags */
+	char trantbl[4]; /* charset table translation */
+	int charset;  /* current charset */
+	int icharset; /* selected charset for sequence */
+	int *tabs;
+	Rune lastc;   /* last printed char outside of sequence, 0 if control */
+} Term;
 
 /* CSI Escape sequence structs */
 /* ESC '[' [[ [<priv>] <arg> [;]] <mode> [<mode>]] */
@@ -157,8 +158,6 @@ typedef struct {
 	char *args[STR_ARG_SIZ];
 	int narg;              /* nb of args */
 } STREscape;
-
-void tfulldirt(void);
 
 static void execsh(char *, char **);
 static void stty(char **);
@@ -196,10 +195,12 @@ static void tscrollup(int, int, int);
 static void tscrolldown(int, int, int);
 static void tsetattr(int *, int);
 static void tsetchar(Rune, Glyph *, int, int);
+static void tsetdirt(int, int);
 static void tsetscroll(int, int);
 static void tswapscreen(void);
 static void tsetmode(int, int, int *, int);
 static int twrite(const char *, int, int);
+static void tfulldirt(void);
 static void tcontrolcode(uchar );
 static void tdectest(char );
 static void tdefutf8(char);
@@ -213,6 +214,8 @@ static void selnormalize(void);
 static void selscroll(int, int);
 static void selsnap(int *, int *, int);
 
+static size_t utf8decode(const char *, Rune *, size_t);
+static Rune utf8decodebyte(char, size_t *);
 static char utf8encodebyte(Rune, size_t);
 static size_t utf8validate(Rune *, size_t);
 
@@ -222,8 +225,8 @@ static char base64dec_getc(const char **);
 static ssize_t xwrite(int, const char *, size_t);
 
 /* Globals */
-Term term;
-Selection sel;
+static Term term;
+static Selection sel;
 static CSIEscape csiescseq;
 static STREscape strescseq;
 static int iofd = 1;
@@ -428,26 +431,7 @@ tlinelen(int y)
 }
 
 void
-xselstart(int col, int row, int snap) {
-	selstart(col, row, term.scr, snap);
-}
-
-int
-tlinehistlen(int y)
-{
-	int i = term.col;
-
-	if (TLINE_HIST(y)[i - 1].mode & ATTR_WRAP)
-		return i;
-
-	while (i > 0 && TLINE_HIST(y)[i - 1].u == ' ')
-		--i;
-
-	return i;
-}
-
-void
-selstart(int col, int row, int scroll, int snap)
+selstart(int col, int row, int snap)
 {
 	selclear();
 	sel.mode = SEL_EMPTY;
@@ -456,7 +440,6 @@ selstart(int col, int row, int scroll, int snap)
 	sel.snap = snap;
 	sel.oe.x = sel.ob.x = col;
 	sel.oe.y = sel.ob.y = row;
-	sel.oe.scroll = sel.ob.scroll = scroll;
 	selnormalize();
 
 	if (sel.snap != 0)
@@ -465,13 +448,10 @@ selstart(int col, int row, int scroll, int snap)
 }
 
 void
-xselextend(int col, int row, int type, int done) {
-	selextend(col, row, term.scr, type, done);
-}
-
-void
-selextend(int col, int row, int scroll, int type, int done)
+selextend(int col, int row, int type, int done)
 {
+	int oldey, oldex, oldsby, oldsey, oldtype;
+
 	if (sel.mode == SEL_IDLE)
 		return;
 	if (done && sel.mode == SEL_EMPTY) {
@@ -479,22 +459,18 @@ selextend(int col, int row, int scroll, int type, int done)
 		return;
 	}
 
-	int const oldey = sel.oe.y;
-	int const oldex = sel.oe.x;
-	int const oldscroll = sel.oe.scroll;
-	int const oldsby = sel.nb.y;
-	int const oldsey = sel.ne.y;
-	int const oldtype = sel.type;
+	oldey = sel.oe.y;
+	oldex = sel.oe.x;
+	oldsby = sel.nb.y;
+	oldsey = sel.ne.y;
+	oldtype = sel.type;
 
 	sel.oe.x = col;
 	sel.oe.y = row;
-	sel.oe.scroll = scroll;
-
 	selnormalize();
 	sel.type = type;
 
-	if (oldey != sel.oe.y || oldex != sel.oe.x || oldscroll != sel.oe.scroll
-			|| oldtype != sel.type || sel.mode == SEL_EMPTY)
+	if (oldey != sel.oe.y || oldex != sel.oe.x || oldtype != sel.type || sel.mode == SEL_EMPTY)
 		tsetdirt(MIN(sel.nb.y, oldsby), MAX(sel.ne.y, oldsey));
 
 	sel.mode = done ? SEL_IDLE : SEL_READY;
@@ -503,21 +479,17 @@ selextend(int col, int row, int scroll, int type, int done)
 void
 selnormalize(void)
 {
-	sel.nb.y = INTERVAL(sel.ob.y + term.scr - sel.ob.scroll, 0, term.bot);
-	sel.ne.y = INTERVAL(sel.oe.y + term.scr - sel.oe.scroll, 0, term.bot);
-	if (sel.type == SEL_REGULAR && sel.nb.y != sel.ne.y) {
-		sel.nb.x = sel.nb.y < sel.ne.y ? sel.ob.x : sel.oe.x;
-		sel.ne.x = sel.nb.y < sel.ne.y ? sel.oe.x : sel.ob.x;
+	int i;
+
+	if (sel.type == SEL_REGULAR && sel.ob.y != sel.oe.y) {
+		sel.nb.x = sel.ob.y < sel.oe.y ? sel.ob.x : sel.oe.x;
+		sel.ne.x = sel.ob.y < sel.oe.y ? sel.oe.x : sel.ob.x;
 	} else {
 		sel.nb.x = MIN(sel.ob.x, sel.oe.x);
 		sel.ne.x = MAX(sel.ob.x, sel.oe.x);
 	}
-
-	if (sel.nb.y > sel.ne.y) {
-		int32_t const tmp = sel.nb.y;
-		sel.nb.y = sel.ne.y;
-		sel.ne.y = tmp;
-	}
+	sel.nb.y = MIN(sel.ob.y, sel.oe.y);
+	sel.ne.y = MAX(sel.ob.y, sel.oe.y);
 
 	selsnap(&sel.nb.x, &sel.nb.y, -1);
 	selsnap(&sel.ne.x, &sel.ne.y, +1);
@@ -525,7 +497,7 @@ selnormalize(void)
 	/* expand selection over line breaks */
 	if (sel.type == SEL_RECTANGULAR)
 		return;
-	int i = tlinelen(sel.nb.y);
+	i = tlinelen(sel.nb.y);
 	if (i < sel.nb.x)
 		sel.nb.x = i;
 	if (tlinelen(sel.ne.y) <= sel.ne.x)
@@ -631,19 +603,11 @@ getsel(void)
 	if (sel.ob.x == -1)
 		return NULL;
 
-	int32_t syb = sel.ob.y - sel.ob.scroll + term.scr;
-	int32_t sye = sel.oe.y - sel.oe.scroll + term.scr;
-	if (syb > sye) {
-		int32_t tmp = sye;
-		sye = syb;
-		syb = tmp;
-	}
-
-	bufsize = (term.col+1) * (sye - syb + 1) * UTF_SIZ;
+	bufsize = (term.col+1) * (sel.ne.y-sel.nb.y+1) * UTF_SIZ;
 	ptr = str = xmalloc(bufsize);
 
 	/* append every set & selected glyph to the selection */
-	for (y = syb; y <= sye; y++) {
+	for (y = sel.nb.y; y <= sel.ne.y; y++) {
 		if ((linelen = tlinelen(y)) == 0) {
 			*ptr++ = '\n';
 			continue;
@@ -653,8 +617,8 @@ getsel(void)
 			gp = &TLINE(y)[sel.nb.x];
 			lastx = sel.ne.x;
 		} else {
-			gp = &TLINE(y)[syb == y ? sel.nb.x : 0];
-			lastx = (sye == y) ? sel.ne.x : term.col-1;
+			gp = &TLINE(y)[sel.nb.y == y ? sel.nb.x : 0];
+			lastx = (sel.ne.y == y) ? sel.ne.x : term.col-1;
 		}
 		last = &TLINE(y)[MIN(lastx, linelen-1)];
 		while (last >= gp && last->u == ' ')
@@ -766,8 +730,14 @@ sigchld(int a)
 	if ((p = waitpid(pid, &stat, WNOHANG)) < 0)
 		die("waiting for pid %hd failed: %s\n", pid, strerror(errno));
 
-	if (pid != p)
+	if (pid != p) {
+		if (p == 0 && wait(&stat) < 0)
+			die("wait: %s\n", strerror(errno));
+
+		/* reinstall sigchld handler */
+		signal(SIGCHLD, sigchld);
 		return;
+	}
 
 	if (WIFEXITED(stat) && WEXITSTATUS(stat))
 		die("child exited with status %d\n", WEXITSTATUS(stat));
@@ -1166,7 +1136,8 @@ tscrolldown(int orig, int n, int copyhist)
 		term.line[i-n] = temp;
 	}
 
-	selscroll(orig, n);
+	if (term.scr == 0)
+		selscroll(orig, n);
 }
 
 void
@@ -1196,7 +1167,8 @@ tscrollup(int orig, int n, int copyhist)
 		term.line[i+n] = temp;
 	}
 
-	selscroll(orig, -n);
+	if (term.scr == 0)
+		selscroll(orig, -n);
 }
 
 void
@@ -1206,10 +1178,8 @@ selscroll(int orig, int n)
 		return;
 
 	if (BETWEEN(sel.nb.y, orig, term.bot) != BETWEEN(sel.ne.y, orig, term.bot)) {
-		sel.oe.scroll = sel.ob.scroll = term.scr;
 		selclear();
 	} else if (BETWEEN(sel.nb.y, orig, term.bot)) {
-		sel.oe.scroll = sel.ob.scroll = term.scr;
 		sel.ob.y += n;
 		sel.oe.y += n;
 		if (sel.ob.y < term.top || sel.ob.y > term.bot ||
@@ -1232,12 +1202,6 @@ tnewline(int first_col)
 		y++;
 	}
 	tmoveto(first_col ? 0 : term.c.x, y);
-}
-
-int
-currentLine(int x, int y)
-{
-	return (x == term.c.x || y == term.c.y);
 }
 
 void
@@ -1292,8 +1256,6 @@ tmoveto(int x, int y)
 	term.c.state &= ~CURSOR_WRAPNEXT;
 	term.c.x = LIMIT(x, 0, term.col-1);
 	term.c.y = LIMIT(y, miny, maxy);
-	// Set the last position in order to restore after normal mode exits.
-	onMove();
 }
 
 void
@@ -2068,18 +2030,16 @@ externalpipe(const Arg *arg)
 	/* ignore sigpipe for now, in case child exists early */
 	oldsigpipe = signal(SIGPIPE, SIG_IGN);
 	newline = 0;
-	for (n = 0; n <= HISTSIZE + 2; n++) {
-		bp = TLINE_HIST(n);
-		lastpos = MIN(tlinehistlen(n) + 1, term.col) - 1;
+	for (n = 0; n < term.row; n++) {
+		bp = term.line[n];
+		lastpos = MIN(tlinelen(n) + 1, term.col) - 1;
 		if (lastpos < 0)
 			break;
-        if (lastpos == 0)
-            continue;
 		end = &bp[lastpos + 1];
 		for (; bp < end; ++bp)
 			if (xwrite(to[1], buf, utf8encode(bp->u, buf)) < 0)
 				break;
-		if ((newline = TLINE_HIST(n)[lastpos].mode & ATTR_WRAP))
+		if ((newline = term.line[n][lastpos].mode & ATTR_WRAP))
 			continue;
 		if (xwrite(to[1], "\n", 1) < 0)
 			break;
@@ -2462,7 +2422,7 @@ tputc(Rune u)
 {
 	char c[UTF_SIZ];
 	int control;
-	int width = 0, len;
+	int width, len;
 	Glyph *gp;
 
 	control = ISCONTROL(u);
@@ -2754,8 +2714,9 @@ draw(void)
 		cx--;
 
 	drawregion(0, 0, term.col, term.row);
-	xdrawcursor(cx, term.c.y, TLINE(term.c.y)[cx],
-			term.ocx, term.ocy, TLINE(term.ocy)[term.ocx]);
+	if (term.scr == 0)
+		xdrawcursor(cx, term.c.y, term.line[term.c.y][cx],
+				term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
 	term.ocx = cx;
 	term.ocy = term.c.y;
 	xfinishdraw();
