@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "monospace:size=11";
+static char *font = "monospace:size=12";
 /* Spare fonts */
 static char *font2[] = { "Inconsolata:pixelsize=11:antialias=true:autohint=true","SymbolsNerdFont:pixelsize=13:antialias=true:autohint=true","LohitDevanagari:pixelsize=13:antialias=true:autohint=true" };
 
@@ -102,60 +102,60 @@ unsigned int tabspaces = 8;
 
 /* Gruvbox */
 
-static const char *colorname[] = {
-	"#282828",
-	"#cc241d",
-	"#98971a",
-	"#d79921",
-	"#458588",
-	"#b16286",
-	"#689d6a",
-	"#a89984",
-	"#928374",
-	"#fb4934",
-	"#b8bb26",
-	"#fabd2f",
-	"#83a598",
-	"#d3869b",
-	"#8ec07c",
-	"#ebdbb2",
-
-	[255] = 0,
-
-	/* more colors can be added after 255 to use with DefaultXX */
-	"#cccccc",
-	"#555555",
-	"#1d2021",
-	"#ebdbb2",
-};
-
-/* Black */
-
 /* static const char *colorname[] = { */
-/* 	"#2E3436", */
-/* 	"#a40000", */
-/* 	"#4E9A06", */
-/* 	"#C4A000", */
-/* 	"#3465A4", */
-/* 	"#75507B", */
-/* 	"#ce5c00", */
-/* 	"#babdb9", */
-/* 	"#555753", */
-/* 	"#EF2929", */
-/* 	"#8AE234", */
-/* 	"#FCE94F", */
-/* 	"#729FCF", */
-/* 	"#AD7FA8", */
-/* 	"#fcaf3e", */
-/* 	"#EEEEEC", */
+/* 	"#282828", */
+/* 	"#cc241d", */
+/* 	"#98971a", */
+/* 	"#d79921", */
+/* 	"#458588", */
+/* 	"#b16286", */
+/* 	"#689d6a", */
+/* 	"#a89984", */
+/* 	"#928374", */
+/* 	"#fb4934", */
+/* 	"#b8bb26", */
+/* 	"#fabd2f", */
+/* 	"#83a598", */
+/* 	"#d3869b", */
+/* 	"#8ec07c", */
+/* 	"#ebdbb2", */
+
 /* 	[255] = 0, */
 
 /* 	/1* more colors can be added after 255 to use with DefaultXX *1/ */
 /* 	"#cccccc", */
 /* 	"#555555", */
-/* 	"#000000", */
-/* 	"#ffffff", */
+/* 	"#1d2021", */
+/* 	"#ebdbb2", */
 /* }; */
+
+/* Black */
+
+static const char *colorname[] = {
+	"#2E3436",
+	"#a40000",
+	"#4E9A06",
+	"#C4A000",
+	"#3465A4",
+	"#75507B",
+	"#ce5c00",
+	"#babdb9",
+	"#555753",
+	"#EF2929",
+	"#8AE234",
+	"#FCE94F",
+	"#729FCF",
+	"#AD7FA8",
+	"#fcaf3e",
+	"#EEEEEC",
+	[255] = 0,
+
+	/* more colors can be added after 255 to use with DefaultXX */
+	"#cccccc",
+	"#555555",
+	"#000000",
+	"#ffffff",
+};
 
 
 /*
